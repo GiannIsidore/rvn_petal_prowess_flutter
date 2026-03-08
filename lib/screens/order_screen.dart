@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
@@ -77,6 +79,29 @@ class _OrderScreenState extends State<OrderScreen> {
     });
   }
 
+  Future<void> _reverseGeocode(LatLng location) async {
+    try {
+      final url = Uri.parse(
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}&zoom=18&addressdetails=1',
+      );
+      final response = await http.get(
+        url,
+        headers: {'User-Agent': 'RVNPetalProwessFlutter/1.0'},
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final address = data['display_name'] as String?;
+        if (address != null && mounted) {
+          setState(() {
+            _addressController.text = address;
+          });
+        }
+      }
+    } catch (_) {
+      // Silently fail — user can still type the address manually
+    }
+  }
+
   double _calculateDistance(
     double lat1,
     double lon1,
@@ -148,11 +173,13 @@ class _OrderScreenState extends State<OrderScreen> {
     }
 
     Position position = await Geolocator.getCurrentPosition();
+    final loc = LatLng(position.latitude, position.longitude);
     setState(() {
-      _selectedLocation = LatLng(position.latitude, position.longitude);
+      _selectedLocation = loc;
       _mapController?.move(_selectedLocation!, 15);
     });
     _updatePrice();
+    _reverseGeocode(loc);
   }
 
   void _clearMapSelection() {
@@ -363,6 +390,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             onTap: (tapPosition, point) {
                               setState(() => _selectedLocation = point);
                               _updatePrice();
+                              _reverseGeocode(point);
                             },
                           ),
                           children: [
