@@ -31,23 +31,6 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> login(String username, String password) async {
-    return await _post('user.php', 'getUser', {
-      'username': username,
-      'password': password,
-    });
-  }
-
-  Future<Map<String, dynamic>> register(
-    String username,
-    String password,
-  ) async {
-    return await _post('user.php', 'createUser', {
-      'username': username,
-      'password': password,
-    });
-  }
-
   Future<List<Product>> getProducts() async {
     try {
       final response = await http.post(

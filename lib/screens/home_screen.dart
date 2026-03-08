@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 import 'products_screen.dart';
-import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -142,12 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProductsScreen()),
-            );
-          }),
-          _buildQuickAction(Icons.admin_panel_settings, 'Owner', () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LoginScreen()),
             );
           }),
         ],
